@@ -6,7 +6,7 @@ class MyRouterDelegate extends RouterDelegate
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
-  bool isRegister = false;
+  bool isRegisterPage = false;
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +16,18 @@ class MyRouterDelegate extends RouterDelegate
         MaterialPage(
             key: const ValueKey(LoginScreen.name),
             child: LoginScreen(onTap: () {
-              isRegister = true;
+              isRegisterPage = true;
               notifyListeners();
             })),
-        if (isRegister)
-          const MaterialPage(
-              key: ValueKey(RegisterScreen.name),
-              child: RegisterScreen())
+        if (isRegisterPage)
+          MaterialPage(
+              key: const ValueKey(RegisterScreen.name),
+              child: RegisterScreen(
+                onTap: () {
+                  isRegisterPage = false;
+                  notifyListeners();
+                },
+              ))
       ],
       onPopPage: (route, result) {
         final didPop = route.didPop(result);
@@ -30,7 +35,7 @@ class MyRouterDelegate extends RouterDelegate
           return false;
         }
 
-        isRegister = false;
+        isRegisterPage = false;
         notifyListeners();
         return true;
       },

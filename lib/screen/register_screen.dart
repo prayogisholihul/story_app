@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const name = 'RegisterScreen';
-  const RegisterScreen({super.key});
+
+  final Function() onTap;
+  const RegisterScreen({super.key, required this.onTap});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -11,10 +13,10 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: SafeArea(
         child: Center(
-          child: Text('REGISTER'),
+          child: InkWell(onTap: widget.onTap,child: const Text('REGISTER')),
         ),
       ),
     );

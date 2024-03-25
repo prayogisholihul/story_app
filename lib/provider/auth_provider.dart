@@ -6,7 +6,8 @@ import '../common/result.dart';
 import '../data/response.dart';
 
 class AuthProvider extends ChangeNotifier {
-  ApiResponse<LoginResult> _apiResponse = ApiResponse(state: ResultState.Idle);
+  ApiResponse<LoginResult> _apiResponse =
+      ApiResponse(state: ResultState.Idle);
 
   ApiResponse<LoginResult> get apiResponse => _apiResponse;
 
@@ -16,11 +17,12 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final data = await ApiService().login(email, password);
-      _apiResponse = ApiResponse(state: ResultState.Success, data: data);
+      _apiResponse = ApiResponse(state: ResultState.Success, data: data.data);
     } catch (e) {
       int colonIndex = e.toString().indexOf(':');
       String cleanedMessage = e.toString().substring(colonIndex + 2).trim();
-      _apiResponse = ApiResponse(state: ResultState.Error, error: cleanedMessage);
+      _apiResponse =
+          ApiResponse(state: ResultState.Error, message: cleanedMessage);
       print(e);
     } finally {
       notifyListeners();

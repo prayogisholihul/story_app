@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/common/result.dart';
+import 'package:story_app/network/api_service.dart';
 import 'package:story_app/provider/auth_provider.dart';
 import 'package:story_app/widget/textinput.dart';
 
@@ -35,10 +36,9 @@ class _LoginScreenState extends State<LoginScreen> {
       await apiProvider.login(_emailController.text, _passwordController.text);
       switch (apiProvider.apiResponse.state) {
         case ResultState.Success:
-          print('success ${apiProvider.apiResponse.data?.loginResult.name}');
+          print('success ${apiProvider.apiResponse.data?.name}');
         case ResultState.Error:
-          showErrorSnackbar(apiProvider.apiResponse.error ??
-              'An error occurred during login.');
+          showErrorSnackbar(apiProvider.apiResponse.message ?? ApiService.errorMessage);
         default:
       }
     }
@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             TextInput(
               controller: _emailController,
-              hint: 'Input email here',
+              hint: 'email',
               prefixIcon: const Icon(Icons.account_circle_rounded),
             ),
             const SizedBox(
@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextInput(
               controller: _passwordController,
-              hint: 'Input password here',
+              hint: 'password',
               isPassword: true,
               prefixIcon: const Icon(Icons.lock),
             ),
