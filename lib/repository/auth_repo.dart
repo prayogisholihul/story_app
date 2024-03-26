@@ -49,21 +49,19 @@ class AuthRepository {
 
   final String stateKey = "state";
 
-  Future<bool> isLoggedIn() async {
+  Future<bool?> isLoggedIn() async {
     final preferences = await SharedPreferences.getInstance();
     await Future.delayed(const Duration(seconds: 2));
-    return preferences.getBool(stateKey) ?? false;
+    return preferences.getBool(stateKey);
   }
 
   Future<bool> setLogin() async {
     final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
     return preferences.setBool(stateKey, true);
   }
 
   Future<bool> logout() async {
     final preferences = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 2));
     return preferences.setBool(stateKey, false);
   }
 }

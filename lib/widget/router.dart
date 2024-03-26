@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:story_app/screen/home_screen.dart';
 import 'package:story_app/screen/login_screen.dart';
 import 'package:story_app/screen/register_screen.dart';
+import 'package:story_app/screen/splash_loading.dart';
 
 import '../repository/auth_repo.dart';
 
@@ -10,12 +11,8 @@ class MyRouterDelegate extends RouterDelegate
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   List<Page> routerStack = [];
   bool isRegisterPage = false;
-  bool isLoggedIn = false;
+  bool? isLoggedIn;
   AuthRepository authRepository = AuthRepository();
-
-  MyRouterDelegate() {
-    _init();
-  }
 
   _init() async {
     isLoggedIn = await authRepository.isLoggedIn();
@@ -24,11 +21,15 @@ class MyRouterDelegate extends RouterDelegate
 
   @override
   Widget build(BuildContext context) {
-    if (isLoggedIn) {
+    _init();
+    if (isLoggedIn == null) {
+      routerStack = _splashLoading;
+    } else if (isLoggedIn == true) {
       routerStack = _mainRoute;
     } else {
       routerStack = _authRoute;
     }
+
     return Navigator(
       key: navigatorKey,
       pages: routerStack,
@@ -52,6 +53,8 @@ class MyRouterDelegate extends RouterDelegate
   Future<void> setNewRoutePath(configuration) {
     throw UnimplementedError();
   }
+
+  get _splashLoading => [const MaterialPage(child: SplashLoading())];
 
   List<Page> get _authRoute => [
         MaterialPage(

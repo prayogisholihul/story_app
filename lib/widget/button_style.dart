@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ButtonRounded extends StatefulWidget {
+class ButtonRounded extends StatelessWidget {
   final void Function() onTap;
   final String titleButton;
   final bool isLoading;
@@ -11,11 +11,6 @@ class ButtonRounded extends StatefulWidget {
       required this.isLoading,
       required this.onTap});
 
-  @override
-  State<ButtonRounded> createState() => _ButtonRoundedState();
-}
-
-class _ButtonRoundedState extends State<ButtonRounded> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -31,12 +26,12 @@ class _ButtonRoundedState extends State<ButtonRounded> {
           const EdgeInsets.all(15.0),
         ),
       ),
-      onPressed: widget.isLoading ? null : widget.onTap,
-      child: widget.isLoading
+      onPressed: isLoading ? null : onTap,
+      child: isLoading
           ? const Center(child: SizedBox(height: 24, width: 24,child: CircularProgressIndicator()))
           : Center(
               child: Text(
-                widget.titleButton,
+                titleButton,
                 style: const TextStyle(color: Colors.black, fontSize: 16),
               ),
             ),
