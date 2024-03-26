@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/common/result.dart';
-import 'package:story_app/network/api_service.dart';
 import 'package:story_app/provider/auth_provider.dart';
+import 'package:story_app/widget/button_style.dart';
 import 'package:story_app/widget/textinput.dart';
+
+import '../common/constant.dart';
 
 class LoginScreen extends StatefulWidget {
   static const name = 'LoginScreen';
 
-  final void Function() onTap;
+  final void Function() toRegister;
+  final void Function() toMain;
 
-  const LoginScreen({super.key, required this.onTap});
+  const LoginScreen({super.key, required this.toRegister, required this.toMain});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -19,6 +22,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,26 +44,41 @@ class _LoginScreenState extends State<LoginScreen> {
 
     void login() async {
       await apiProvider.login(_emailController.text, _passwordController.text);
-      switch (apiProvider.apiResponse.state) {
+      switch (apiProvider.loginResult.state) {
         case ResultState.Success:
-          print('success ${apiProvider.apiResponse.data?.name}');
+          widget.toMain();
+          break;
         case ResultState.Error:
-          showErrorSnackbar(apiProvider.apiResponse.message ?? ApiService.errorMessage);
+          showErrorSnackbar(
+              apiProvider.loginResult.message ?? Constant.errorMessage);
+          break;
         default:
+          break;
       }
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
           child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const Text(
+              'Log In',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 50,
+                  fontWeight: FontWeight.w400),
+            ),
+            const SizedBox(
+              height: 24,
+            ),
             TextInput(
               controller: _emailController,
               hint: 'email',
-              prefixIcon: const Icon(Icons.account_circle_rounded),
+              prefixIcon: const Icon(Icons.email),
             ),
             const SizedBox(
               height: 16,
@@ -65,36 +90,15 @@ class _LoginScreenState extends State<LoginScreen> {
               prefixIcon: const Icon(Icons.lock),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0),
-                  ),
-                ),
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).primaryColorLight),
-                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                  const EdgeInsets.all(15.0),
-                ),
-              ),
-              onPressed: apiProvider.apiResponse.state == ResultState.Loading
-                  ? null
-                  : () => login(),
-              child: apiProvider.apiResponse.state == ResultState.Loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : const Center(
-                      child: Text(
-                        'Login',
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                      ),
-                    ),
-            ),
+            ButtonRounded(
+                titleButton: 'Login',
+                isLoading: apiProvider.loginResult.state == ResultState.Loading,
+                onTap: login),
             const SizedBox(
               height: 12,
             ),
             InkWell(
-                onTap: widget.onTap,
+                onTap: widget.toRegister,
                 child: const Text(
                   'Create account here',
                   style: TextStyle(color: Colors.blue),
