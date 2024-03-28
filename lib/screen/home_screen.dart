@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       );
-    } else if(Platform.isIOS) {
+    } else if (Platform.isIOS) {
       CupertinoAlertDialog(
         title: const Text('Warning!'),
         content: const Text('Are you sure to logout?'),
@@ -94,6 +94,13 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Theme.of(context).primaryColorLight,
         title: const Text('Home'),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).primaryColorLight,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        child: const Icon(Icons.add),
+        onPressed: () {},
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       drawerDragStartBehavior: DragStartBehavior.start,
       drawerEdgeDragWidth: 100,
       drawer: Drawer(
@@ -102,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).primaryColorLight,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,14 +117,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     auth.user.name,
                     style: const TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 24,
                         fontWeight: FontWeight.bold),
                   ),
                   Text(
                     auth.user.email,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 12,
                     ),
                   ),
@@ -149,10 +156,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget listContent(List<StoryData> data) {
     return ListView.builder(
+        padding: const EdgeInsets.only(top: 16, bottom: 24),
         itemCount: data.length,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.only(top: 16.0, bottom: 12),
+            padding: const EdgeInsets.only(bottom: 16),
             child: InkWell(
               onTap: () {},
               child: Column(
