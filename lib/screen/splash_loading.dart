@@ -5,9 +5,26 @@ class SplashLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
+    return Scaffold(
+      body: Stack(
+        children: [
+          const SizedBox(
+            height: double.infinity,
+            child: Center(
+              child: Text(
+                'Story App',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 50,
+                    color: Colors.black),
+              ),
+            ),
+          ),
+          Positioned(
+              left: MediaQuery.of(context).size.width / 2 - 25,
+              bottom: 50,
+              child: const CircularProgressIndicator())
+        ],
       ),
     );
   }

@@ -14,6 +14,10 @@ class MyRouterDelegate extends RouterDelegate
   bool? isLoggedIn;
   AuthRepository authRepository = AuthRepository();
 
+  MyRouterDelegate() {
+    _init();
+  }
+
   _init() async {
     isLoggedIn = await authRepository.isLoggedIn();
     notifyListeners();
@@ -21,7 +25,6 @@ class MyRouterDelegate extends RouterDelegate
 
   @override
   Widget build(BuildContext context) {
-    _init();
     if (isLoggedIn == null) {
       routerStack = _splashLoading;
     } else if (isLoggedIn == true) {

@@ -15,7 +15,7 @@ class ImageWithLoading extends StatelessWidget {
           width: constraints.maxWidth,
           height: 300,
           placeholder: (context, url) => const Center(
-            child: CircularProgressIndicator(),
+            child: Icon(Icons.image),
           ),
           errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
           fit: BoxFit.cover,
