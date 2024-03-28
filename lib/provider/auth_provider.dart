@@ -4,6 +4,7 @@ import 'package:story_app/data/model/login_result.dart';
 import 'package:story_app/repository/auth_repo.dart';
 
 import '../common/result.dart';
+import '../data/model/user.dart';
 import '../data/response.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -43,5 +44,16 @@ class AuthProvider extends ChangeNotifier {
           message: api.message.toString().cleanedMessage);
     }
     notifyListeners();
+  }
+
+  User _user = User(email: '', name: '', token: '');
+
+  User get user => _user;
+
+  getUser() async {
+    final repo = await AuthRepository().getUser();
+    if (repo != null) {
+      _user = repo;
+    }
   }
 }

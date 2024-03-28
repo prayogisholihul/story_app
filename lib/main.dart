@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/provider/auth_provider.dart';
+import 'package:story_app/provider/main_provider.dart';
 import 'package:story_app/widget/router.dart';
 
 void main() {
@@ -25,8 +26,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => MainProvider())
+      ],
       child: MaterialApp(
         title: 'Story App',
         theme: ThemeData(

@@ -86,6 +86,7 @@ class MyRouterDelegate extends RouterDelegate
             child: HomeScreen(onTap: () {
               isLoggedIn = false;
               authRepository.logout();
+              authRepository.deleteUser();
               notifyListeners();
             })),
       ];
