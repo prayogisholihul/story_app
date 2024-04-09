@@ -111,12 +111,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(
                 height: 12,
               ),
-              InkWell(
-                  onTap: widget.onTap,
-                  child: const Text(
-                    'Login existing account',
-                    style: TextStyle(color: Colors.blue),
-                  ))
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Already have an account?',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  const SizedBox(width: 4,),
+                  InkWell(
+                      onTap: widget.onTap,
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(color: Colors.blue),
+                      ))
+                ],
+              )
             ],
           ),
         ),

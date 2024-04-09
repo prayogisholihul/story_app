@@ -13,7 +13,8 @@ class LoginScreen extends StatefulWidget {
   final void Function() toRegister;
   final void Function() toMain;
 
-  const LoginScreen({super.key, required this.toRegister, required this.toMain});
+  const LoginScreen(
+      {super.key, required this.toRegister, required this.toMain});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -96,12 +97,22 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 12,
             ),
-            InkWell(
-                onTap: widget.toRegister,
-                child: const Text(
-                  'Create account here',
-                  style: TextStyle(color: Colors.blue),
-                ))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Don\'t have an account?',
+                  style: TextStyle(color: Colors.black),
+                ),
+                const SizedBox(width: 4,),
+                InkWell(
+                    onTap: widget.toRegister,
+                    child: const Text(
+                      'Register',
+                      style: TextStyle(color: Colors.blue),
+                    ))
+              ],
+            )
           ],
         ),
       )),

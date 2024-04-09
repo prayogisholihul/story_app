@@ -36,4 +36,26 @@ class StoryRepository {
           state: ResultState.Error, message: e.toString(), error: true);
     }
   }
+
+  Future<ApiResponse> addStory(String filepath, String description) async {
+    try {
+      final response = await _service.addStory(filepath, description);
+      final api =  ApiResponse.fromJson(json.decode(response.body));
+      print(api.message ?? api.error);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return ApiResponse(
+            state: ResultState.Success,
+            data: api.data,
+            message: api.message,
+            error: api.error);
+      } else {
+        return ApiResponse(
+            state: ResultState.Error, message: api.message, error: api.error);
+      }
+    } catch (e) {
+      return ApiResponse(
+          state: ResultState.Error, message: e.toString(), error: true);
+    }
+  }
 }

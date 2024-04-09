@@ -26,4 +26,23 @@ class MainProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  ApiResponse<ApiResponse> _addStoryState = ApiResponse(state: ResultState.Idle);
+
+  ApiResponse<ApiResponse> get addStoryState => _addStoryState;
+
+  addStoryEvent(String filePath, String description) async {
+    _addStoryState = ApiResponse(state: ResultState.Loading);
+    notifyListeners();
+
+    final api = await storyRepo.addStory(filePath, description);
+    if (api.state == ResultState.Success) {
+      _addStoryState = ApiResponse(state: ResultState.Success, data: api.data);
+    } else {
+      _addStoryState = ApiResponse(
+          state: ResultState.Error,
+          message: api.message.toString().cleanedMessage);
+    }
+    notifyListeners();
+  }
 }

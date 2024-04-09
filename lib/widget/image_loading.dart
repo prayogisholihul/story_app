@@ -10,15 +10,18 @@ class ImageWithLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return CachedNetworkImage(
-          imageUrl: imageUrl,
-          width: constraints.maxWidth,
-          height: 300,
-          placeholder: (context, url) => const Center(
-            child: Icon(Icons.image),
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            width: constraints.maxWidth,
+            height: 300,
+            placeholder: (context, url) => const Center(
+              child: Icon(Icons.image),
+            ),
+            errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+            fit: BoxFit.cover,
           ),
-          errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
-          fit: BoxFit.cover,
         );
       },
     );

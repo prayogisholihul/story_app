@@ -3,19 +3,23 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/common/result.dart';
 import 'package:story_app/data/model/story_result.dart';
 import 'package:story_app/provider/auth_provider.dart';
 import 'package:story_app/provider/main_provider.dart';
+import 'package:story_app/widget/app_bar.dart';
 import 'package:story_app/widget/image_loading.dart';
 
 class HomeScreen extends StatefulWidget {
   static const name = 'HomeScreen';
-  final void Function() onTap;
+  final void Function() toLogout;
+  final void Function(File) toAddstory;
 
-  const HomeScreen({super.key, required this.onTap});
+  const HomeScreen(
+      {super.key, required this.toLogout, required this.toAddstory});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -39,7 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          // Return the AlertDialog
           return AlertDialog(
             title: const Text('Warning!'),
             content: const Text('Are you sure to logout?'),
@@ -53,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  widget.onTap();
+                  widget.toLogout();
                 },
                 child: const Text('OK'),
               ),
@@ -75,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              widget.onTap();
+              widget.toLogout();
             },
             child: const Text('OK'),
           ),
@@ -84,21 +87,123 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  late File _image;
+  final picker = ImagePicker();
+
+  Future getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        widget.toAddstory(_image);
+      }
+    });
+  }
+
+  Future getImageFromCamera() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        widget.toAddstory(_image);
+      }
+    });
+  }
+
+  Future showOptionsAndroid() async {
+    showModalBottomSheet(
+        useSafeArea: true,
+        context: context,
+        builder: (ctx) => Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: SizedBox(
+                height: 120,
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: const Text('Gallery'),
+                      leading: const Icon(Icons.photo),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        getImageFromGallery();
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Camera'),
+                      leading: const Icon(Icons.camera_alt),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        getImageFromCamera();
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ));
+  }
+
+  Future showOptionsIos() async {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.photo),
+                SizedBox(
+                  width: 8,
+                ),
+                Text('Gallery'),
+              ],
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+              getImageFromGallery();
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.camera_alt),
+                SizedBox(
+                  width: 8,
+                ),
+                Text('Camera'),
+              ],
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+              getImageFromCamera();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<MainProvider>();
     final auth = context.read<AuthProvider>();
-    // print(formatDate(provider.stories.data![0].createdAt));
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColorLight,
-        title: const Text('Home'),
-      ),
+      appBar: const AppBarView(title: 'Story App'),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColorLight,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        onPressed: () {
+          if (Platform.isIOS) {
+            showOptionsIos();
+          } else {
+            showOptionsAndroid();
+          }
+        },
         child: const Icon(Icons.add),
-        onPressed: () {},
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       drawerDragStartBehavior: DragStartBehavior.start,
@@ -156,45 +261,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget listContent(List<StoryData> data) {
     return ListView.builder(
-        padding: const EdgeInsets.only(top: 16, bottom: 24),
+        padding: const EdgeInsets.only(top: 16, bottom: 50),
         itemCount: data.length,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 16, left: 14, right: 14),
             child: InkWell(
-              onTap: () {},
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12.0),
-                    child: Text(
-                      data[index].name,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16),
+                onTap: () {},
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: Text(
+                        data[index].name,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12.0),
-                    child: Text(
-                      data[index].description,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w400, fontSize: 16),
+                    const SizedBox(
+                      height: 6,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  ImageWithLoading(imageUrl: data[index].photoUrl),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12.0),
-                    child: Text(
-                      formatDate(data[index].createdAt),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w400, fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                    ImageWithLoading(imageUrl: data[index].photoUrl),
+                  ],
+                )),
           );
         });
   }

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:story_app/screen/add_story_screen.dart';
 import 'package:story_app/screen/home_screen.dart';
 import 'package:story_app/screen/login_screen.dart';
 import 'package:story_app/screen/register_screen.dart';
@@ -12,6 +15,7 @@ class MyRouterDelegate extends RouterDelegate
   List<Page> routerStack = [];
   bool isRegisterPage = false;
   bool? isLoggedIn;
+  File? toAddStory;
   AuthRepository authRepository = AuthRepository();
 
   MyRouterDelegate() {
@@ -43,6 +47,7 @@ class MyRouterDelegate extends RouterDelegate
         }
 
         isRegisterPage = false;
+        toAddStory = null;
         notifyListeners();
         return true;
       },
@@ -86,11 +91,27 @@ class MyRouterDelegate extends RouterDelegate
   List<Page> get _mainRoute => [
         MaterialPage(
             key: const ValueKey(HomeScreen.name),
-            child: HomeScreen(onTap: () {
-              isLoggedIn = false;
-              authRepository.logout();
-              authRepository.deleteUser();
-              notifyListeners();
-            })),
+            child: HomeScreen(
+              toLogout: () {
+                isLoggedIn = false;
+                authRepository.logout();
+                authRepository.deleteUser();
+                notifyListeners();
+              },
+              toAddstory: (file) {
+                toAddStory = file;
+                notifyListeners();
+              },
+            )),
+        if (toAddStory != null)
+          MaterialPage(
+              key: const ValueKey(AddStoryScreen.name),
+              child: AddStoryScreen(
+                imageFile: toAddStory!,
+                onBackPressed: () {
+                  toAddStory = null;
+                  notifyListeners();
+                },
+              ))
       ];
 }
