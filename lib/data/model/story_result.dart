@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class StoryData {
   static const key = 'listStory';
 
@@ -38,4 +40,8 @@ class StoryData {
     "lat": lat,
     "lon": lon,
   };
+
+  String formattedDate() {
+    return DateFormat('dd-MM-yyyy').format(createdAt);
+  }
 }

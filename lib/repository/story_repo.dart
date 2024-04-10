@@ -41,7 +41,6 @@ class StoryRepository {
     try {
       final response = await _service.addStory(filepath, description);
       final api =  ApiResponse.fromJson(json.decode(response.body));
-      print(api.message ?? api.error);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(
@@ -56,6 +55,23 @@ class StoryRepository {
     } catch (e) {
       return ApiResponse(
           state: ResultState.Error, message: e.toString(), error: true);
+    }
+  }
+
+  Future<ApiResponse<StoryData>> getDetailStory(String id) async {
+    try {
+      final response = await _service.getDetailStory(id);
+      if (response.statusCode == 200) {
+        final api = ApiResponse.fromJson(json.decode(response.body),
+            dataJson: (parser) => StoryData.fromJson(parser),
+            parser: 'story');
+        return ApiResponse(state: ResultState.Success, data: api.data, error: api.error, message: api.message);
+      } else {
+        final api = ApiResponse.fromJson(json.decode(response.body));
+        return ApiResponse(state: ResultState.Error, error: api.error, message: api.message);
+      }
+    } catch (e) {
+      return ApiResponse(state: ResultState.Error, error: true, message: e.toString());
     }
   }
 }

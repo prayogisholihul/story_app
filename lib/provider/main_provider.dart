@@ -27,9 +27,9 @@ class MainProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  ApiResponse<ApiResponse> _addStoryState = ApiResponse(state: ResultState.Idle);
+  ApiResponse _addStoryState = ApiResponse(state: ResultState.Idle);
 
-  ApiResponse<ApiResponse> get addStoryState => _addStoryState;
+  ApiResponse get addStoryState => _addStoryState;
 
   addStoryEvent(String filePath, String description) async {
     _addStoryState = ApiResponse(state: ResultState.Loading);
@@ -40,6 +40,25 @@ class MainProvider extends ChangeNotifier {
       _addStoryState = ApiResponse(state: ResultState.Success, data: api.data);
     } else {
       _addStoryState = ApiResponse(
+          state: ResultState.Error,
+          message: api.message.toString().cleanedMessage);
+    }
+    notifyListeners();
+  }
+
+  ApiResponse<StoryData> _detailStoryState = ApiResponse(state: ResultState.Idle);
+
+  ApiResponse<StoryData> get detailStoryState => _detailStoryState;
+
+  detailStoryEvent(String id) async {
+    _detailStoryState = ApiResponse(state: ResultState.Loading);
+    notifyListeners();
+
+    final api = await storyRepo.getDetailStory(id);
+    if (api.state == ResultState.Success) {
+      _detailStoryState = ApiResponse(state: ResultState.Success, data: api.data);
+    } else {
+      _detailStoryState = ApiResponse(
           state: ResultState.Error,
           message: api.message.toString().cleanedMessage);
     }

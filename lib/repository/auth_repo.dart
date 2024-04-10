@@ -21,7 +21,6 @@ class AuthRepository {
             parser: LoginResult.key);
         setLogin();
         saveToken(User(email: email, name: api.data?.name ?? '', token: api.data?.token ?? ''));
-        print(api.data?.token);
         return ApiResponse(state: ResultState.Success, data: api.data, error: api.error, message: api.message);
       } else {
         final api = ApiResponse.fromJson(json.decode(response.body));

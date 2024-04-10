@@ -17,9 +17,10 @@ class HomeScreen extends StatefulWidget {
   static const name = 'HomeScreen';
   final void Function() toLogout;
   final void Function(File) toAddstory;
+  final void Function(String) toDetail;
 
   const HomeScreen(
-      {super.key, required this.toLogout, required this.toAddstory});
+      {super.key, required this.toLogout, required this.toAddstory, required this.toDetail});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -267,7 +268,9 @@ class _HomeScreenState extends State<HomeScreen> {
           return Padding(
             padding: const EdgeInsets.only(bottom: 16, left: 14, right: 14),
             child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  widget.toDetail(data[index].id);
+                },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

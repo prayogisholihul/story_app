@@ -46,4 +46,20 @@ class StoryNetwork {
       throw Exception(e);
     }
   }
+
+  Future<http.Response> getDetailStory(String id) async {
+    try {
+      final url = Uri.parse('${Constant.baseUrl}/stories/$id');
+      final user = await authRepository.getUser();
+      final call = await http.get(url, headers: {
+        'Authorization': "Bearer ${user?.token ?? ''}",
+        'Content-Type': 'application/json'
+      });
+      return call;
+    } on SocketException catch (e) {
+      throw Exception(Constant.errorMessage);
+    } on http.ClientException catch (e) {
+      throw Exception(e);
+    }
+  }
 }

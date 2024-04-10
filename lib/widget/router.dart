@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:story_app/screen/add_story_screen.dart';
+import 'package:story_app/screen/detail_screen.dart';
 import 'package:story_app/screen/home_screen.dart';
 import 'package:story_app/screen/login_screen.dart';
 import 'package:story_app/screen/register_screen.dart';
@@ -12,11 +13,12 @@ import '../repository/auth_repo.dart';
 class MyRouterDelegate extends RouterDelegate
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  AuthRepository authRepository = AuthRepository();
   List<Page> routerStack = [];
   bool isRegisterPage = false;
   bool? isLoggedIn;
   File? toAddStory;
-  AuthRepository authRepository = AuthRepository();
+  String? detailId;
 
   MyRouterDelegate() {
     _init();
@@ -48,6 +50,7 @@ class MyRouterDelegate extends RouterDelegate
 
         isRegisterPage = false;
         toAddStory = null;
+        detailId = null;
         notifyListeners();
         return true;
       },
@@ -102,6 +105,10 @@ class MyRouterDelegate extends RouterDelegate
                 toAddStory = file;
                 notifyListeners();
               },
+              toDetail: (id) {
+                detailId = id;
+                notifyListeners();
+              },
             )),
         if (toAddStory != null)
           MaterialPage(
@@ -110,6 +117,16 @@ class MyRouterDelegate extends RouterDelegate
                 imageFile: toAddStory!,
                 onBackPressed: () {
                   toAddStory = null;
+                  notifyListeners();
+                },
+              )),
+        if (detailId != null)
+          MaterialPage(
+              key: const ValueKey('DetailScreen'),
+              child: DetailScreen(
+                detailId: detailId!,
+                onBackPressed: () {
+                  detailId = null;
                   notifyListeners();
                 },
               ))
