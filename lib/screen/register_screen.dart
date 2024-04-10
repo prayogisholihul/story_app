@@ -31,7 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  showErrorSnackbar(String errorMessage) {
+  showSnackbar(String errorMessage) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(errorMessage),
@@ -48,10 +48,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       switch (apiProvider.registerResult.state) {
         case ResultState.Success:
+          showSnackbar('Success create account');
           widget.onTap();
           break;
         case ResultState.Error:
-          showErrorSnackbar(
+          showSnackbar(
               apiProvider.registerResult.message ?? Constant.errorMessage);
           break;
         default:
