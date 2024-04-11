@@ -1,9 +1,5 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:story_app/common/result.dart';
@@ -16,11 +12,14 @@ import 'package:story_app/widget/image_loading.dart';
 class HomeScreen extends StatefulWidget {
   static const name = 'HomeScreen';
   final void Function() toLogout;
-  final void Function(File) toAddstory;
+  final void Function() toGallery;
   final void Function(String) toDetail;
 
   const HomeScreen(
-      {super.key, required this.toLogout, required this.toAddstory, required this.toDetail});
+      {super.key,
+      required this.toLogout,
+      required this.toGallery,
+      required this.toDetail});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -39,154 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return df.format(time);
   }
 
-  void logoutDialog() {
-    if (Platform.isAndroid) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Warning!'),
-            content: const Text('Are you sure to logout?'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  widget.toLogout();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    } else if (Platform.isIOS) {
-      CupertinoAlertDialog(
-        title: const Text('Warning!'),
-        content: const Text('Are you sure to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              widget.toLogout();
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      );
-    }
-  }
-
-  late File _image;
-  final picker = ImagePicker();
-
-  Future getImageFromGallery() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-        widget.toAddstory(_image);
-      }
-    });
-  }
-
-  Future getImageFromCamera() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-        widget.toAddstory(_image);
-      }
-    });
-  }
-
-  Future showOptionsAndroid() async {
-    showModalBottomSheet(
-        useSafeArea: true,
-        context: context,
-        builder: (ctx) => Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: SizedBox(
-                height: 120,
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: const Text('Gallery'),
-                      leading: const Icon(Icons.photo),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        getImageFromGallery();
-                      },
-                    ),
-                    ListTile(
-                      title: const Text('Camera'),
-                      leading: const Icon(Icons.camera_alt),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        getImageFromCamera();
-                      },
-                    )
-                  ],
-                ),
-              ),
-            ));
-  }
-
-  Future showOptionsIos() async {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) => CupertinoActionSheet(
-        actions: [
-          CupertinoActionSheetAction(
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.photo),
-                SizedBox(
-                  width: 8,
-                ),
-                Text('Gallery'),
-              ],
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-              getImageFromGallery();
-            },
-          ),
-          CupertinoActionSheetAction(
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt),
-                SizedBox(
-                  width: 8,
-                ),
-                Text('Camera'),
-              ],
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-              getImageFromCamera();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<MainProvider>();
@@ -197,13 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColorLight,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        onPressed: () {
-          if (Platform.isIOS) {
-            showOptionsIos();
-          } else {
-            showOptionsAndroid();
-          }
-        },
+        onPressed: widget.toGallery,
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -240,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Logout'),
-              onTap: logoutDialog,
+              onTap: widget.toLogout,
             )
           ],
         ),

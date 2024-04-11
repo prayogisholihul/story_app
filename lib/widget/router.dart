@@ -5,10 +5,14 @@ import 'package:story_app/screen/add_story_screen.dart';
 import 'package:story_app/screen/detail_screen.dart';
 import 'package:story_app/screen/home_screen.dart';
 import 'package:story_app/screen/login_screen.dart';
+import 'package:story_app/screen/logout_screen.dart';
 import 'package:story_app/screen/register_screen.dart';
 import 'package:story_app/screen/splash_loading.dart';
+import 'package:story_app/widget/fade_anim_pages.dart';
+import 'package:story_app/widget/slide_anim_pages.dart';
 
 import '../repository/auth_repo.dart';
+import '../screen/galery_photo_screen.dart';
 
 class MyRouterDelegate extends RouterDelegate
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
@@ -19,6 +23,8 @@ class MyRouterDelegate extends RouterDelegate
   bool? isLoggedIn;
   File? toAddStory;
   String? detailId;
+  bool logoutDialog = false;
+  bool fileStoryDialog = false;
 
   MyRouterDelegate() {
     _init();
@@ -51,6 +57,8 @@ class MyRouterDelegate extends RouterDelegate
         isRegisterPage = false;
         toAddStory = null;
         detailId = null;
+        logoutDialog = false;
+        fileStoryDialog = false;
         notifyListeners();
         return true;
       },
@@ -96,13 +104,11 @@ class MyRouterDelegate extends RouterDelegate
             key: const ValueKey(HomeScreen.name),
             child: HomeScreen(
               toLogout: () {
-                isLoggedIn = false;
-                authRepository.logout();
-                authRepository.deleteUser();
+                logoutDialog = true;
                 notifyListeners();
               },
-              toAddstory: (file) {
-                toAddStory = file;
+              toGallery: () {
+                fileStoryDialog = true;
                 notifyListeners();
               },
               toDetail: (id) {
@@ -110,6 +116,34 @@ class MyRouterDelegate extends RouterDelegate
                 notifyListeners();
               },
             )),
+        if (logoutDialog)
+          FadeAnimPage(
+              opaque: false,
+              child: LogoutDialog(
+                onCancel: () {
+                  logoutDialog = false;
+                  notifyListeners();
+                },
+                onLogout: () {
+                  logoutDialog = false;
+                  isLoggedIn = false;
+                  authRepository.logout();
+                  authRepository.deleteUser();
+                  notifyListeners();
+                },
+              )),
+        if (fileStoryDialog)
+          SlideAnimPage(
+              child: GaleryPhotoDialog(
+            closeDialog: () {
+              fileStoryDialog = false;
+              notifyListeners();
+            },
+            addStory: (file) {
+              toAddStory = file;
+              notifyListeners();
+            },
+          )),
         if (toAddStory != null)
           MaterialPage(
               key: const ValueKey(AddStoryScreen.name),

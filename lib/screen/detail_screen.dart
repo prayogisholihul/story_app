@@ -34,15 +34,11 @@ class _DetailScreenState extends State<DetailScreen> {
           child: SingleChildScrollView(
         child: Column(
           children: [
-            LayoutBuilder(
-              builder: (context, constraints) => CachedNetworkImage(
-                width: constraints.maxWidth,
-                height: 500,
-                imageUrl: provider.detailStoryState.data?.photoUrl ?? '',
-                errorWidget: (context, url, error) =>
-                const Center(child: CircularProgressIndicator()),
-                fit: BoxFit.cover,
-              ),
+            CachedNetworkImage(
+              imageUrl: provider.detailStoryState.data?.photoUrl ?? '',
+              errorWidget: (context, url, error) =>
+              const Center(child: CircularProgressIndicator()),
+              fit: BoxFit.cover,
             ),
             Padding(
               padding:
