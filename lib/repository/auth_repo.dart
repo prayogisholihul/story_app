@@ -71,7 +71,7 @@ class AuthRepository {
 
   Future<bool> saveToken(User user) async {
     final preferences = await SharedPreferences.getInstance();
-    return preferences.setString(userKey, user.toJson());
+    return preferences.setString(userKey, user.toJsonEncode());
   }
 
   Future<bool> deleteUser() async {
@@ -85,7 +85,7 @@ class AuthRepository {
     final json = preferences.getString(userKey) ?? "";
     User? user;
     try {
-      user = User.fromJson(json);
+      user = User.fromJsonDecode(json);
     } catch (e) {
       user = null;
     }

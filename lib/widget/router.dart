@@ -6,6 +6,7 @@ import 'package:story_app/screen/detail_screen.dart';
 import 'package:story_app/screen/home_screen.dart';
 import 'package:story_app/screen/login_screen.dart';
 import 'package:story_app/screen/logout_screen.dart';
+import 'package:story_app/screen/map_screen.dart';
 import 'package:story_app/screen/register_screen.dart';
 import 'package:story_app/screen/splash_loading.dart';
 import 'package:story_app/widget/fade_anim_pages.dart';
@@ -25,6 +26,7 @@ class MyRouterDelegate extends RouterDelegate
   String? detailId;
   bool logoutDialog = false;
   bool fileStoryDialog = false;
+  bool mapScreen = false;
 
   MyRouterDelegate() {
     _init();
@@ -52,6 +54,12 @@ class MyRouterDelegate extends RouterDelegate
         final didPop = route.didPop(result);
         if (!didPop) {
           return false;
+        }
+
+        if (mapScreen) {
+          mapScreen = false;
+          notifyListeners();
+          return true;
         }
 
         isRegisterPage = false;
@@ -153,16 +161,30 @@ class MyRouterDelegate extends RouterDelegate
                   toAddStory = null;
                   notifyListeners();
                 },
+                toMap: () {
+                  mapScreen = true;
+                  notifyListeners();
+                },
               )),
         if (detailId != null)
           MaterialPage(
               key: const ValueKey('DetailScreen'),
               child: DetailScreen(
-                detailId: detailId!,
-                onBackPressed: () {
-                  detailId = null;
-                  notifyListeners();
-                },
-              ))
+                  detailId: detailId!,
+                  onBackPressed: () {
+                    detailId = null;
+                    notifyListeners();
+                  },
+                  toMap: () {
+                    mapScreen = true;
+                    notifyListeners();
+                  })),
+        if (mapScreen)
+          MaterialPage(
+              key: const ValueKey('MapScreen'),
+              child: MapScreen(onBackPressed: () {
+                mapScreen = false;
+                notifyListeners();
+              }))
       ];
 }

@@ -1,5 +1,9 @@
 import 'package:intl/intl.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'story_result.g.dart';
+
+@JsonSerializable()
 class StoryData {
   static const key = 'listStory';
 
@@ -21,25 +25,9 @@ class StoryData {
     required this.lon,
   });
 
-  factory StoryData.fromJson(Map<String, dynamic> json) => StoryData(
-    id: json["id"],
-    name: json["name"],
-    description: json["description"],
-    photoUrl: json["photoUrl"],
-    createdAt: DateTime.parse(json["createdAt"]),
-    lat: json["lat"]?.toDouble(),
-    lon: json["lon"]?.toDouble(),
-  );
+  factory StoryData.fromJson(Map<String, dynamic> json) => _$StoryDataFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "description": description,
-    "photoUrl": photoUrl,
-    "createdAt": createdAt.toIso8601String(),
-    "lat": lat,
-    "lon": lon,
-  };
+  Map<String, dynamic> toJson() => _$StoryDataToJson(this);
 
   String formattedDate() {
     return DateFormat('dd-MM-yyyy').format(createdAt);

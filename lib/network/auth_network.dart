@@ -28,6 +28,7 @@ class AuthNetwork {
       final url = Uri.parse('${Constant.baseUrl}/login');
       return await http.post(url, body: {'email': email, 'password': password});
     } on SocketException catch (e) {
+      print(e);
       throw Exception(Constant.errorMessage);
     } on http.ClientException catch (e) {
       throw Exception(e);

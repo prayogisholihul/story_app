@@ -8,9 +8,16 @@ import '../common/constant.dart';
 class StoryNetwork {
   AuthRepository authRepository = AuthRepository();
 
-  Future<http.Response> getStories() async {
+  Future<http.Response> getStories(int page, int size) async {
     try {
-      final url = Uri.parse('${Constant.baseUrl}/stories');
+      Map<String, String> queryParams = {
+        'page': page.toString(),
+        'size': size.toString(),
+        'location': '1'
+      };
+
+      final url = Uri.parse('${Constant.baseUrl}/stories')
+          .replace(queryParameters: queryParams);
       final user = await authRepository.getUser();
       final call = await http.get(url, headers: {
         'Authorization': "Bearer ${user?.token ?? ''}",
@@ -24,7 +31,7 @@ class StoryNetwork {
     }
   }
 
-  Future<http.Response> addStory(String filepath, String description) async {
+  Future<http.Response> addStory(String filepath, String description, double? lat, double? lon) async {
     try {
       final url = Uri.parse('${Constant.baseUrl}/stories');
       final user = await authRepository.getUser();
@@ -37,12 +44,15 @@ class StoryNetwork {
       final file = await http.MultipartFile.fromPath('photo', filepath);
       request.files.add(file);
       request.fields['description'] = description;
+      if (lat != null && lon != null) {
+        request.fields['lat'] = lat.toString();
+        request.fields['lon'] = lon.toString();
+      }
       var response = await request.send();
       return await http.Response.fromStream(response);
     } on SocketException catch (e) {
       throw Exception(Constant.errorMessage);
     } on http.ClientException catch (e) {
-      print(e);
       throw Exception(e);
     }
   }

@@ -1,5 +1,10 @@
 import 'dart:convert';
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'user.g.dart';
+
+@JsonSerializable()
 class User {
   final String email;
   final String name;
@@ -14,15 +19,11 @@ class User {
   @override
   String toString() => 'User(email: $email, name: $name)';
 
-  Map<String, dynamic> toMap() {
-    return {'email': email, 'name': name, 'token': token};
-  }
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(email: map['email'], name: map['name'], token: map['token']);
-  }
+  Map<String, dynamic> toJson() => _$UserToJson(this);
 
-  String toJson() => json.encode(toMap());
+  String toJsonEncode() => json.encode(toJson());
 
-  factory User.fromJson(String source) => User.fromMap(json.decode(source));
+  factory User.fromJsonDecode(String source) => User.fromJson(json.decode(source));
 }

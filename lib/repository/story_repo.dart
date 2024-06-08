@@ -9,9 +9,9 @@ import '../data/response.dart';
 class StoryRepository {
   final StoryNetwork _service = StoryNetwork();
 
-  Future<ApiResponse<List<StoryData>>> getStories() async {
+  Future<ApiResponse<List<StoryData>>> getStories(int page, int size) async {
     try {
-      final response = await _service.getStories();
+      final response = await _service.getStories(page, size);
       Map<String, dynamic> parsedJson = jsonDecode(response.body);
 
       final api = ApiResponse<List<StoryData>>(
@@ -32,14 +32,15 @@ class StoryRepository {
             state: ResultState.Error, message: api.message, error: api.error);
       }
     } catch (e) {
+      print(e);
       return ApiResponse(
           state: ResultState.Error, message: e.toString(), error: true);
     }
   }
 
-  Future<ApiResponse> addStory(String filepath, String description) async {
+  Future<ApiResponse> addStory(String filepath, String description, double? lat, double? lon) async {
     try {
-      final response = await _service.addStory(filepath, description);
+      final response = await _service.addStory(filepath, description, lat, lon);
       final api =  ApiResponse.fromJson(json.decode(response.body));
 
       if (response.statusCode == 200 || response.statusCode == 201) {

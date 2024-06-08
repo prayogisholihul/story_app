@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:story_app/common/result.dart';
 import 'package:story_app/data/model/story_result.dart';
 import 'package:story_app/provider/auth_provider.dart';
 import 'package:story_app/provider/main_provider.dart';
@@ -26,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   @override
   void initState() {
     super.initState();
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<MainProvider>();
+    final provider = context.read<MainProvider>();
     final auth = context.read<AuthProvider>();
 
     return Scaffold(
@@ -51,7 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: widget.toGallery,
         child: const Icon(Icons.add),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       drawerDragStartBehavior: DragStartBehavior.start,
       drawerEdgeDragWidth: 100,
       drawer: Drawer(
@@ -90,50 +90,39 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: provider.stories.state == ResultState.Loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : listContent(provider.stories.data ?? []),
-            ),
-          ],
+      body: PagedListView<int, StoryData>(
+        pagingController: provider.pagingController,
+        builderDelegate: PagedChildBuilderDelegate<StoryData>(
+          itemBuilder: (context, item, index) => listContent(item)
         ),
       ),
     );
   }
 
-  Widget listContent(List<StoryData> data) {
-    return ListView.builder(
-        padding: const EdgeInsets.only(top: 16, bottom: 50),
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16, left: 14, right: 14),
-            child: InkWell(
-                onTap: () {
-                  widget.toDetail(data[index].id);
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12.0),
-                      child: Text(
-                        data[index].name,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 6,
-                    ),
-                    ImageWithLoading(imageUrl: data[index].photoUrl),
-                  ],
-                )),
-          );
-        });
+  Widget listContent(StoryData data) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, left: 14, right: 14),
+      child: InkWell(
+          onTap: () {
+            widget.toDetail(data.id);
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0),
+                child: Text(
+                  data.name,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              ImageWithLoading(imageUrl: data.photoUrl),
+            ],
+          )),
+    );
   }
 }

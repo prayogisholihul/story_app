@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:story_app/common/error_message.dart';
 import 'package:story_app/common/result.dart';
 import 'package:story_app/data/model/story_result.dart';
@@ -8,34 +9,48 @@ import 'package:story_app/repository/story_repo.dart';
 class MainProvider extends ChangeNotifier {
   final StoryRepository storyRepo = StoryRepository();
 
-  ApiResponse<List<StoryData>> _stories = ApiResponse(state: ResultState.Idle);
+  final pageSize = 5;
 
-  ApiResponse<List<StoryData>> get stories => _stories;
+  final PagingController<int, StoryData> pagingController =
+      PagingController(firstPageKey: 1);
 
-  getStories() async {
-    _stories = ApiResponse(state: ResultState.Loading);
-    notifyListeners();
+  getStories() {
+    pagingController.addPageRequestListener((pageKey) {
+      fetchPage(pageKey);
+    });
+  }
 
-    final api = await storyRepo.getStories();
+  refreshHome() {
+    pagingController.refresh();
+  }
+
+  Future<void> fetchPage(int pageKey) async {
+    final api = await storyRepo.getStories(pageKey, pageSize);
+
     if (api.state == ResultState.Success) {
-      _stories = ApiResponse(state: ResultState.Success, data: api.data);
-    } else {
-      _stories = ApiResponse(
-          state: ResultState.Error,
-          message: api.message.toString().cleanedMessage);
+      final isLastPage = api.data!.length < pageSize;
+      if (isLastPage) {
+        pagingController.appendLastPage(api.data ?? []);
+      } else {
+        final nextPageKey = pageKey + 1;
+        pagingController.appendPage(api.data ?? [], nextPageKey);
+      }
     }
-    notifyListeners();
+
+    if (api.state == ResultState.Error) {
+      pagingController.error = api.message;
+    }
   }
 
   ApiResponse _addStoryState = ApiResponse(state: ResultState.Idle);
 
   ApiResponse get addStoryState => _addStoryState;
 
-  addStoryEvent(String filePath, String description) async {
+  addStoryEvent(String filePath, String description, double? lat, double? lon) async {
     _addStoryState = ApiResponse(state: ResultState.Loading);
     notifyListeners();
 
-    final api = await storyRepo.addStory(filePath, description);
+    final api = await storyRepo.addStory(filePath, description, lat , lon);
     if (api.state == ResultState.Success) {
       _addStoryState = ApiResponse(state: ResultState.Success, data: api.data);
     } else {
@@ -46,7 +61,13 @@ class MainProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  ApiResponse<StoryData> _detailStoryState = ApiResponse(state: ResultState.Idle);
+  addStoryToIdle() {
+    _addStoryState = ApiResponse(state: ResultState.Idle);
+    notifyListeners();
+  }
+
+  ApiResponse<StoryData> _detailStoryState =
+      ApiResponse(state: ResultState.Idle);
 
   ApiResponse<StoryData> get detailStoryState => _detailStoryState;
 
@@ -56,7 +77,8 @@ class MainProvider extends ChangeNotifier {
 
     final api = await storyRepo.getDetailStory(id);
     if (api.state == ResultState.Success) {
-      _detailStoryState = ApiResponse(state: ResultState.Success, data: api.data);
+      _detailStoryState =
+          ApiResponse(state: ResultState.Success, data: api.data);
     } else {
       _detailStoryState = ApiResponse(
           state: ResultState.Error,
